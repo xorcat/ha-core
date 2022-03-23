@@ -204,9 +204,6 @@ class EntityCategory(StrEnum):
     # Diagnostic: An entity exposing some configuration parameter or diagnostics of a device
     DIAGNOSTIC = "diagnostic"
 
-    # System: An entity which is not useful for the user to interact with
-    SYSTEM = "system"
-
 
 class EntityPlatformState(Enum):
     """The platform state of an entity."""
@@ -257,6 +254,7 @@ class EntityDescription:
         "config", "diagnostic", "system"
     ] | None = None
     entity_registry_enabled_default: bool = True
+    entity_registry_hidden_default: bool = False
     force_update: bool = False
     icon: str | None = None
     name: str | None = None
@@ -317,6 +315,7 @@ class Entity(ABC):
     _attr_entity_category: EntityCategory | None
     _attr_entity_picture: str | None = None
     _attr_entity_registry_enabled_default: bool
+    _attr_entity_registry_hidden_default: bool
     _attr_extra_state_attributes: MutableMapping[str, Any]
     _attr_force_update: bool
     _attr_icon: str | None
@@ -475,6 +474,15 @@ class Entity(ABC):
         if hasattr(self, "entity_description"):
             return self.entity_description.entity_registry_enabled_default
         return True
+
+    @property
+    def entity_registry_hidden_default(self) -> bool:
+        """Return if the entity should be hidden when first added to the entity registry."""
+        if hasattr(self, "_attr_entity_registry_hidden_default"):
+            return self._attr_entity_registry_hidden_default
+        if hasattr(self, "entity_description"):
+            return self.entity_description.entity_registry_hidden_default
+        return False
 
     @property
     def attribution(self) -> str | None:

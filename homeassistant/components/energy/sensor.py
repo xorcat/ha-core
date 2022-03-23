@@ -29,7 +29,6 @@ from homeassistant.core import (
     split_entity_id,
     valid_entity_id,
 )
-from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_state_change_event
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -210,7 +209,7 @@ class EnergyCostSensor(SensorEntity):
     utility.
     """
 
-    _attr_entity_category = EntityCategory.SYSTEM
+    _attr_entity_registry_hidden_default = True
     _wrong_state_class_reported = False
     _wrong_unit_reported = False
 

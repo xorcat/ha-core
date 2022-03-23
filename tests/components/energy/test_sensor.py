@@ -22,6 +22,8 @@ from homeassistant.const import (
     STATE_UNKNOWN,
     VOLUME_CUBIC_METERS,
 )
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from homeassistant.setup import async_setup_component
 import homeassistant.util.dt as dt_util
 
@@ -70,6 +72,41 @@ async def test_cost_sensor_no_states(hass, hass_storage) -> None:
     }
     await setup_integration(hass)
     # TODO: No states, should the cost entity refuse to setup?
+
+
+async def test_cost_sensor_attributes(hass: HomeAssistant, hass_storage) -> None:
+    """Test sensor attributes."""
+    await async_init_recorder_component(hass)
+    energy_data = data.EnergyManager.default_preferences()
+    energy_data["energy_sources"].append(
+        {
+            "type": "grid",
+            "flow_from": [
+                {
+                    "stat_energy_from": "sensor.energy_consumption",
+                    "entity_energy_from": "sensor.energy_consumption",
+                    "stat_cost": None,
+                    "entity_energy_price": None,
+                    "number_energy_price": 1,
+                }
+            ],
+            "flow_to": [],
+            "cost_adjustment_day": 0,
+        }
+    )
+
+    hass_storage[data.STORAGE_KEY] = {
+        "version": 1,
+        "data": energy_data,
+    }
+    await setup_integration(hass)
+
+    registry = er.async_get(hass)
+    cost_sensor_entity_id = "sensor.energy_consumption_cost"
+    entry = registry.async_get(cost_sensor_entity_id)
+    assert entry.entity_category is None
+    assert entry.disabled_by is None
+    assert entry.hidden_by is None
 
 
 @pytest.mark.parametrize("initial_energy,initial_cost", [(0, "0.0"), (None, "unknown")])
