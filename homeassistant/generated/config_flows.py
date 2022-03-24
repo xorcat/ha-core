@@ -341,6 +341,7 @@ FLOWS = {
         "threshold",
         "tibber",
         "tile",
+        "time_date",
         "tolo",
         "tomorrowio",
         "toon",
