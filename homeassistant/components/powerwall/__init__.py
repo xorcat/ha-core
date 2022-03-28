@@ -104,13 +104,13 @@ class PowerwallDataManager:
     def _update_data(self) -> PowerwallData:
         """Fetch data from API endpoint."""
         _LOGGER.debug("Updating data")
-        for attempt in range(2):
+        for attempt in range(10):
             try:
-                if attempt == 1:
+                if attempt % 3:
                     self._recreate_powerwall_login()
                 data = _fetch_powerwall_data(self.power_wall)
             except PowerwallUnreachableError as err:
-                raise UpdateFailed("Unable to fetch data from powerwall") from err
+                continue
             except MissingAttributeError as err:
                 _LOGGER.error("The powerwall api has changed: %s", str(err))
                 # The error might include some important information about what exactly changed.
